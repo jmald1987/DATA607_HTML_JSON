@@ -1,0 +1,14 @@
+---
+title: "HTML and JSON"
+author: "Johnny Maldonado"
+format: html
+editor: visual
+---
+
+## Introduction
+
+My previous experience developing a Refuse Room Logger introduced me to working with structured data, web applications, and APIs. Although the project was eventually discontinued, the experience provided a foundation for understanding how information is organized and managed across different components of an application. For this assignment, I plan to apply that experience to a smaller, more manageable dataset.
+
+I have selected three Microsoft Press books covering Microsoft Office 2016. Each book will be represented using its title, authors, publication year, publisher, and ISBN. At least one of the selected books has multiple authors, meeting the assignment requirements.
+
+I will manually create an HTML table and a JSON file containing the same book information. Using R, I will import the HTML data with rvest and the JSON data with jsonlite. After converting both into comparable data frames and checking their structures and data types, I will use identical() to determine whether the results match. The process and findings will be documented in this Quarto file.
