@@ -7,8 +7,105 @@ editor: visual
 
 ## Introduction
 
-My previous experience developing a Refuse Room Logger introduced me to working with structured data, web applications, and APIs. Although the project was eventually discontinued, the experience provided a foundation for understanding how information is organized and managed across different components of an application. For this assignment, I plan to apply that experience to a smaller, more manageable dataset.
+For this assignment, I selected three Microsoft Press books covering Microsoft Office 2016. Each book is represented by its title, authors, publication year, publisher, and ISBN. One of the selected books has multiple authors, satisfying the assignment requirements.
 
-I have selected three Microsoft Press books covering Microsoft Office 2016. Each book will be represented using its title, authors, publication year, publisher, and ISBN. At least one of the selected books has multiple authors, meeting the assignment requirements.
+The book information is organized into two files: an HTML table and a JSON file. Both contain the same records and attributes, allowing me to examine how R handles different data formats. I will use the `rvest` and `jsonlite` packages to import the files, convert their contents into data frames, and compare the results using `identical()`. The process and findings will be documented in this Quarto report.
 
-I will manually create an HTML table and a JSON file containing the same book information. Using R, I will import the HTML data with rvest and the JSON data with jsonlite. After converting both into comparable data frames and checking their structures and data types, I will use identical() to determine whether the results match. The process and findings will be documented in this Quarto file.
+## Books Chosen
+
+The following three Microsoft Press books were selected for the dataset.
+
+| Title | Authors | Year | Publisher | ISBN |
+|----|----|---:|----|----|
+| [Microsoft Office 2016 Step by Step](https://www.microsoftpressstore.com/store/microsoft-office-2016-step-by-step-9780735699236) | Joan Lambert, Curtis Frye | 2015 | Microsoft Press | 978-0-7356-9923-6 |
+| [Microsoft Excel 2016 Step by Step](https://www.microsoftpressstore.com/store/microsoft-excel-2016-step-by-step-9780735698802) | Curtis Frye | 2015 | Microsoft Press | 978-0-7356-9880-2 |
+| [Microsoft Word 2016 Step by Step](https://www.microsoftpressstore.com/store/microsoft-word-2016-step-by-step-9780735697775) | Joan Lambert | 2015 | Microsoft Press | 978-0-7356-9777-5 |
+
+## Importing HTML Data
+
+The HTML file contains a table with the selected book information. The file is hosted on GitHub and imported using the `rvest` package.
+
+```{r html import}
+#| label: import-html
+
+library(rvest)
+
+html_url <- "https://raw.githubusercontent.com/jmald1987/DATA607_HTML_JSON/refs/heads/main/books.html"
+
+books_html <- read_html(html_url) |>
+  html_element("table") |>
+  html_table() |>
+  as.data.frame()
+
+knitr::kable(
+  books_html,
+  caption = "Books Imported from HTML"
+)
+```
+
+## Importing JSON Data
+
+The JSON file represents the same three books as structured records. The file is also hosted on GitHub and imported using `jsonlite`.
+
+```{r json import}
+#| label: import-json
+
+library(jsonlite)
+
+json_url <- "https://raw.githubusercontent.com/jmald1987/DATA607_HTML_JSON/refs/heads/main/books.json"
+
+books_json <- fromJSON(json_url) |>
+  as.data.frame()
+
+knitr::kable(
+  books_json,
+  caption = "Books Imported from JSON"
+)
+```
+
+## Comparing the Data Frames
+
+After importing both files, I will standardize the column names, column order, and data types before comparing the data frames.
+
+```{r compare DF }
+
+
+# Standardize column names
+names(books_html) <- tolower(names(books_html))
+names(books_json) <- tolower(names(books_json))
+
+# Match column order
+books_html <- books_html[
+  , names(books_json), drop = FALSE
+]
+
+# Standardize data types
+books_html[] <- lapply(books_html, as.character)
+books_json[] <- lapply(books_json, as.character)
+
+# Compare the data frames
+comparison <- identical(books_html, books_json)
+
+comparison
+```
+
+## Results
+
+The comparison checks whether both imported data frames contain identical values after standardizing their structures.
+
+```{r results}
+
+if (comparison) {
+  cat("The HTML and JSON data frames are identical.")
+} else {
+  cat("The HTML and JSON data frames are not identical.")
+}
+```
+
+## Conclusion
+
+This assignment explored how the same book information can be stored in HTML and JSON and imported into R. Using `rvest` and `jsonlite`, both files were converted into data frames for comparison.
+
+After standardizing the column order and data types, `identical()` returned **`r comparison`**. `r if (comparison) "This confirms that both files produced identical data frames after standardization." else "This indicates that differences remain between the imported data frames and require further examination."`
+
+The exercise provided practical experience working with both formats and validating data consistency across different sources.
